@@ -1,0 +1,16 @@
+[Unit]
+Description=Libvirt for Cattle
+After=docker.service
+Requires=docker.service
+
+[Service]
+ExecStart=/bin/bash -c "docker rm -f cattle-libvirt 2>/dev/null; exec docker run --name cattle-libvirt --rm --privileged -v /lib/modules:/lib/modules -v /proc:/host/proc -v /run:/host/run -v /var:/host/var cattle/libvirt:dev | /bin/bash"
+ExecStopPost=/usr/bin/docker stop cattle-libvirt
+Restart=always
+RestartSec=10s
+
+[Install]
+WantedBy=multi-user.target
+
+[X-Fleet]
+X-ConditionMachineID=%MACHINE%

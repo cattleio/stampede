@@ -1,0 +1,19 @@
+[Unit]
+Description=%NAME%
+After=docker.service
+Requires=docker.service
+
+[Service]
+Environment=STAMPEDE_PORT=9080
+Environment=STAMPEDE_VERSION=dev
+Environment=CATTLE_VERSION=dev
+EnvironmentFile=-/etc/environment
+ExecStart=/bin/bash -c "/usr/bin/docker run --rm cattle/stampede-wrapper:${STAMPEDE_VERSION} %n | bash"
+Restart=always
+RestartSec=10s
+Type=notify
+NotifyAccess=all
+TimeoutStopSec=15
+
+[Install]
+WantedBy=multi-user.target

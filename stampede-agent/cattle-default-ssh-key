@@ -1,0 +1,37 @@
+#!/usr/bin/env python
+
+from __future__ import print_function
+from cattle import from_env
+import os
+import sys
+
+
+def error(*args):
+    print(*args, file=sys.stderr)
+    sys.exit(1)
+
+
+def main():
+    url = os.environ.get('CATTLE_URL', 'http://localhost:9080/v1/schemas')
+    client = from_env(prefix='CATTLE_', url=url)
+
+    accounts = client.list_account(uuid='admin')
+
+    if len(accounts) == 0:
+        error('Failed to find admin account')
+
+    cred_ids = accounts[0].defaultCredentialIds
+
+    if cred_ids is None or len(cred_ids) == 0:
+        error('Failed to find default ssh key')
+
+    cred = client.by_id_credential(cred_ids[0])
+
+    if cred is None:
+        error('Failed to find credential {0}'.format(cred.id))
+
+    print(cred.secretValue)
+
+
+if __name__ == '__main__':
+    main()

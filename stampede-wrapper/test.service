@@ -1,0 +1,18 @@
+[Unit]
+Description=Cattle Agent
+After=docker.service
+Requires=docker.service
+
+[Service]
+#EnvironmentFile=/etc/environment
+ExecStart=/mnt/src/stampede/wrapper/wrapper.sh agent
+Restart=always
+RestartSec=10s
+Type=notify
+NotifyAccess=all
+
+[Install]
+WantedBy=multi-user.target
+
+[X-Fleet]
+X-ConditionMachineID=%MACHINE%

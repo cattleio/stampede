@@ -1,0 +1,4 @@
+#!/bin/bash
+
+export CATTLE_URL=${CATTLE_URL:-http://localhost:9080/v1/schemas}
+exec /usr/local/cattle "$@"

@@ -1,0 +1,17 @@
+[Unit]
+Description=Cattle Agent
+After=docker.service
+Requires=docker.service
+
+[Service]
+EnvironmentFile=/etc/environment
+ExecStart=/bin/bash -c "export CATTLE_AGENT_IP=${COREOS_PUBLIC_IPV4}; : $${CATTLE_AGENT_IP:=${COREOS_PRIVATE_IPV4}}; docker rm -f cattle-agent 2>/dev/null; exec docker run --name cattle-agent --rm --privileged -v /lib/modules:/lib/modules -v /proc:/host/proc -v /run:/host/run -v /var:/host/var -v /opt/bin:/host/opt/bin -e CATTLE_EXEC_AGENT=true -e CATTLE_ETCD_REGISTRATION=true -e CATTLE_AGENT_IP=$${CATTLE_AGENT_IP} -e CATTLE_LIBVIRT_REQUIRED=true cattle/stampede-agent:dev"
+ExecStopPost=/usr/bin/docker stop cattle-agent
+Restart=always
+RestartSec=10s
+
+[Install]
+WantedBy=multi-user.target
+
+[X-Fleet]
+X-ConditionMachineID=%MACHINE%
