@@ -27,7 +27,7 @@ unit_file()
         -e 's/%NAME%/'"$1"'/g'
 }
 
-read STAMPEDE_VERSION CATTLE_VERSION <version
+source version
 
 STAMPEDE_VERSION=$(echo $STAMPEDE_VERSION | sed 's/-SNAPSHOT/-SNAPSHOT-'$(uuidgen)'/g')
 
@@ -61,10 +61,10 @@ for i in $IMAGES; do
     echo Done building $IMAGE
 
     popd
-    echo $IMAGE > $DIST/images
+    echo $IMAGE >> $DIST/images
 done
 
-unit_file "Stampede : Manager" > $DIST/cattle-stampede.service
+unit_file "Stampede : Manager" | sed '/X-ConditionMachineID/d' > $DIST/cattle-stampede.service
 
 echo
 echo '======================================================='

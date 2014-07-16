@@ -47,7 +47,11 @@ setup()
 
         if [ "$FIRST" = "true" ]; then
             FIRST=false
-            info Stampede is now ready at $CATTLE_URL
+            if [ -n "$PUBLIC_MASTER" ]; then
+                info Stampede is now ready at http://${PUBLIC_MASTER}:${PORT}
+            else
+                info Stampede is now ready at $CATTLE_URL
+            fi
         fi
     done
 }

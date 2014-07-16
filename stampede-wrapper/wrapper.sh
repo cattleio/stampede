@@ -1,6 +1,13 @@
 #/bin/bash
 set -e
 
+########################################################################
+# WARNING:                                                             #
+#   On a scale of 1 to 10, we're at 11 in terms of hacks in this file. #
+#   You might live a happier life never knowing what really goes on in #
+#   this file.  You've been warned.                                    #
+########################################################################
+
 COMMON_ARGS="--privileged -e CATTLE_SCRIPT_DEBUG=${CATTLE_SCRIPT_DEBUG}"
 SERVICE=$ARGS
 STAMPEDE_PORT=${STAMPEDE_PORT:-8080}
@@ -59,6 +66,9 @@ ready()
     if [ -n "$MAINPID" ]; then
         if [ ! -e /proc/$MAINPID ]; then
             mainpid $$
+            if [ -n "$LOG_PID" ]; then
+                kill $LOG_PID 2>/dev/null || true
+            fi
         fi
     fi
 
@@ -111,9 +121,10 @@ run_foreground()
     docker run "$@" | bash &
     for i in {1..10}; do
         PID=$(getpid)
-        if [ -n "$PID" ]; then
+        if [ -n "$PID" ] && [ "$PID" != "0" ]; then
             break
         fi
+        PID=
         sleep 1
     done
 
@@ -133,6 +144,7 @@ run_background()
     fi
 
     docker logs -f $ID &
+    LOG_PID=$!
 }
 
 run()
@@ -173,12 +185,12 @@ setup_args()
         ;;
     cattle-libvirt)
         TAG=${CATTLE_VERSION}
-        HOST_MNTS="/lib/modules /proc /run /var/lib/docker"
+        HOST_MNTS="/lib/modules /proc /run /var/lib/docker /var/lib/cattle"
         PIDFILE=/run/cattle/libvirt/libvirtd.pid
         ;;
     cattle-stampede-server)
         NOTIFY=true
-        DOCKER_ARGS="-i -v /var/lib/cattle:/var/lib/cattle -e PORT=${STAMPEDE_PORT} -p ${STAMPEDE_PORT}:8080 -e PRIVATE_MACHINE_IP=${PRIVATE_IP} -e PUBLIC_MACHINE_IP=${PUBLIC_IP}"
+        DOCKER_ARGS="-i -v /var/lib/cattle:/var/lib/cattle -e PORT=${STAMPEDE_PORT} -p ${STAMPEDE_PORT}:8080 -e PRIVATE_MACHINE_IP=${PRIVATE_IP} -e PUBLIC_MACHINE_IP=${PUBLIC_IP} -e CATTLE_AGENT_INSTANCE_IMAGE_TAG=${CATTLE_VERSION}"
         ;;
     cattle-stampede)
         HOST_MNTS="/proc"
@@ -205,7 +217,7 @@ setup_args $SERVICE
 setup_notify
 setup_hostmnts
 
-pull cattle/agent-instance:latest
+pull cattle/agent-instance:${CATTLE_VERSION}
 pull $IMAGE
 
 run $COMMON_ARGS --name $NAME $DOCKER_ARGS $IMAGE

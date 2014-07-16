@@ -28,11 +28,17 @@ get_master()
 
 set_master()
 {
-    put ${MASTER_KEY}'?prevExist=false' -d value=${PRIVATE_MACHINE_IP} > /dev/null && put ${PUBLIC_MASTER_KEY} -d value=$PUBLIC_MACHINE_IP
+    put ${MASTER_KEY}'?prevExist=false' -d value=${PRIVATE_MACHINE_IP} > /dev/null
+}
+
+set_master_public_ip()
+{
+    put ${PUBLIC_MASTER_KEY} -d value=$PUBLIC_MACHINE_IP
 }
 
 run_master()
 {
+    set_master_public_ip
     exec /usr/share/cattle/cattle.sh --notify /done.sh --notify-error /error.sh
 }
 
@@ -41,7 +47,8 @@ run_not_master()
     iptables -t nat -I PREROUTING -i eth0 -p tcp --dport 8080 -j DNAT --to ${MASTER}:${PORT}
     iptables -t nat -I POSTROUTING -o eth0 -p tcp --dport $PORT -d ${MASTER} -j MASQUERADE
 
-    /notify.py
+    /notify.py >/tmp/cattle-success 2>&1
+
     while true; do
         sleep 5
     done
@@ -53,7 +60,7 @@ if [ -z "${PRIVATE_MACHINE_IP}" ] || [ -z "${PUBLIC_MACHINE_IP}" ]; then
 fi
 
 if [ "$(get_master)" != "${PRIVATE_MACHINE_IP}" ]; then
-    set_master
+    set_master || true
 fi
 
 MASTER="$(get_master)"
