@@ -143,7 +143,7 @@ install_units_on_machine()
     local machine=$1
     local unit_file=units/$2
     local md5=$(md5sum $unit_file | awk '{print $1}')
-    local unit_name=$(echo $2 | sed 's/MACHINE/'${machine:0:6}-${md5:0:6}'/')
+    local unit_name=$(echo $2 | sed 's/MACHINE/'${md5:0:6}-${machine:0:6}'/')
     local short_name=$(echo $2 | sed 's/.MACHINE.*//'g)
     local output=installed-units/$unit_name
     local found=false
