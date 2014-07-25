@@ -63,17 +63,29 @@ notify()
 
 ready()
 {
-    if [ -n "$MAINPID" ]; then
-        if [ ! -e /proc/$MAINPID ]; then
-            mainpid $$
-            if [ -n "$LOG_PID" ]; then
-                kill $LOG_PID 2>/dev/null || true
-            fi
-        fi
+    if [ -n "$MAINPID" ] && [ ! -e /proc/$MAINPID ]; then
+        mainpid $$
     fi
 
     if [ "$NOTIFY" != "true" ]; then
         notify "READY=1" SubState running
+    fi
+
+    # Catch situation in which docker logs is polling a stopped containers
+    # and holding open the cgroup
+    if [ -n "$LOG_PID" ] && [ -n "$MAINPID" ]; then
+        for i in {1..10}; do
+            if [ ! -e /proc/$LOG_PID ]; then
+                break
+            fi
+
+            if [ ! -e /proc/$MAINPID ]; then
+                kill $LOG_PID 2>/dev/null || true
+                break
+            fi
+
+            sleep 1
+        done
     fi
 }
 
@@ -184,7 +196,7 @@ setup_args()
         DOCKER_ARGS="-e CATTLE_EXEC_AGENT=true -e CATTLE_ETCD_REGISTRATION=true -e CATTLE_AGENT_IP=${PUBLIC_IP} -e CATTLE_LIBVIRT_REQUIRED=true"
         ;;
     cattle-libvirt)
-        TAG=${CATTLE_VERSION}
+        TAG=${CATTLE_LIBVIRT_VERSION}
         HOST_MNTS="/lib/modules /proc /run /var/lib/docker /var/lib/cattle"
         PIDFILE=/run/cattle/libvirt/libvirtd.pid
         ;;

@@ -1,5 +1,6 @@
 #!/bin/bash
 set -e
+set -o pipefail
 
 cd $(dirname $0)
 
@@ -23,6 +24,7 @@ unit_file()
 {
     cat ${BASE_DIR}/stampede-wrapper/service.template | sed \
         -e 's/CATTLE_VERSION=dev/CATTLE_VERSION='$CATTLE_VERSION'/g' \
+        -e 's/CATTLE_LIBVIRT_VERSION=dev/CATTLE_LIBVIRT_VERSION='$CATTLE_LIBVIRT_VERSION'/g' \
         -e 's/STAMPEDE_VERSION=dev/STAMPEDE_VERSION='$STAMPEDE_VERSION'/g' \
         -e 's/%NAME%/'"$1"'/g'
 }
