@@ -5,8 +5,9 @@ from collections import OrderedDict
 from cattle import from_env
 
 URLS = OrderedDict()
-URLS['Alpha'] = 'http://alpha.release.core-os.net/amd64-usr/'
+URLS['Stable'] = 'http://stable.release.core-os.net/amd64-usr/'
 URLS['Beta'] = 'http://beta.release.core-os.net/amd64-usr/'
+URLS['Alpha'] = 'http://alpha.release.core-os.net/amd64-usr/'
 
 DIGEST = 'coreos_production_openstack_image.img.bz2.DIGESTS'
 IMG = 'coreos_production_openstack_image.img.bz2'
