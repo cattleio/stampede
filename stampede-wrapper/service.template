@@ -9,6 +9,7 @@ Environment=STAMPEDE_VERSION=dev
 Environment=CATTLE_VERSION=dev
 Environment=CATTLE_LIBVIRT_VERSION=dev
 EnvironmentFile=-/etc/environment
+ExecStartPre=/usr/bin/docker run --rm -v /opt/bin:/opt/bin ibuildthecloud/systemd-docker:0.1.0
 ExecStart=/bin/bash -c "/usr/bin/docker run --rm cattle/stampede-wrapper:${STAMPEDE_VERSION} %n | bash"
 Restart=always
 RestartSec=10s

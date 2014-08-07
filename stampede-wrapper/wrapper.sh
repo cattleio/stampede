@@ -67,9 +67,7 @@ ready()
         mainpid $$
     fi
 
-    if [ "$NOTIFY" != "true" ]; then
-        notify "READY=1" SubState running
-    fi
+    notify "READY=1" SubState running
 
     # Catch situation in which docker logs is polling a stopped containers
     # and holding open the cgroup
@@ -147,32 +145,39 @@ run_foreground()
 
 run_background()
 {
-    ID=$(/usr/bin/docker run -d "$@")
-    PID=$(docker inspect -f '{{.State.Pid}}' $ID)
-    FROM="/sys/fs/cgroup/systemd/$(grep 'name=systemd' /proc/$$/cgroup | cut -f3 -d:)/cgroup.procs"
+    PIDFILE=/var/run/${NAME}.pid
 
-    if [ -e "$FROM" ]; then
-        echo $PID > $FROM
+    if [ -e ${PIDFILE} ]; then
+        rm -f ${PIDFILE}
     fi
 
-    docker logs -f $ID &
-    LOG_PID=$!
+    /opt/bin/systemd-docker --pid-file=${PIDFILE} run --rm "$@" &
+
+    for i in {1..10}; do
+        if [ ! -e $PIDFILE ]; then
+            sleep 1
+        else
+            exit 0
+        fi
+    done
+
+    exit 1
 }
 
 run()
 {
-    if docker inspect $NAME >/dev/null 2>&1; then
-        docker rm -f $NAME
-    fi
-
     if [ -z "$PIDFILE" ]; then
         run_background "$@"
     else
-        run_foreground "$@"
-    fi
+        if docker inspect $NAME >/dev/null 2>&1; then
+            docker rm -f $NAME
+        fi
 
-    mainpid $PID
-    ready
+        run_foreground "$@"
+
+        mainpid $PID
+        ready
+    fi
 }
 
 setup_hostmnts()
@@ -201,7 +206,7 @@ setup_args()
         PIDFILE=/run/cattle/libvirt/libvirtd.pid
         ;;
     cattle-stampede-server)
-        NOTIFY=true
+        SYSTEMD_ARGS="--notify"
         DOCKER_ARGS="-i -v /var/lib/cattle:/var/lib/cattle -e PORT=${STAMPEDE_PORT} -p ${STAMPEDE_PORT}:8080 -e PRIVATE_MACHINE_IP=${PRIVATE_IP} -e PUBLIC_MACHINE_IP=${PUBLIC_IP} -e CATTLE_AGENT_INSTANCE_IMAGE_TAG=${CATTLE_VERSION}"
         ;;
     cattle-stampede)
@@ -217,16 +222,8 @@ setup_args()
     IMAGE="$(echo $NAME | sed 's!cattle-!cattle/!'):${TAG}"
 }
 
-setup_notify()
-{
-    if [[ "$NOTIFY" == "true" && -n "$NOTIFY_SOCKET" && -e "$NOTIFY_SOCKET" ]]; then
-        COMMON_ARGS="${COMMON_ARGS} -v ${NOTIFY_SOCKET}:${NOTIFY_SOCKET} -e NOTIFY_SOCKET=${NOTIFY_SOCKET}"
-    fi
-}
-
 setup_ips
 setup_args $SERVICE
-setup_notify
 setup_hostmnts
 
 pull cattle/agent-instance:${CATTLE_VERSION}
