@@ -1,0 +1,24 @@
+[Unit]
+Description=Stampede : Manager
+After=docker.service
+Requires=docker.service
+
+[Service]
+Environment=STAMPEDE_PORT=9080
+Environment=STAMPEDE_VERSION=0.1.0-SNAPSHOT-6ce8a8ef-c8e4-48e6-adc5-ebe7c4978960
+Environment=CATTLE_VERSION=0.2.0-SNAPSHOT-1c7363e8d6bb8dd8ce877939ee73c9cf54c47e51-d77b39cb-33cb-4e6a-aa45-af646ef49cfa
+Environment=CATTLE_LIBVIRT_VERSION=0.2.0-SNAPSHOT-1c7363e8d6bb8dd8ce877939ee73c9cf54c47e51-d77b39cb-33cb-4e6a-aa45-af646ef49cfa
+EnvironmentFile=-/etc/environment
+ExecStartPre=/usr/bin/docker run --rm -v /opt/bin:/opt/bin ibuildthecloud/systemd-docker:0.1.0
+ExecStart=/bin/bash -c "/usr/bin/docker run --rm cattle/stampede-wrapper:${STAMPEDE_VERSION} %n | bash"
+Restart=always
+RestartSec=10s
+Type=notify
+NotifyAccess=all
+TimeoutStartSec=120
+TimeoutStopSec=15
+
+[Install]
+WantedBy=multi-user.target
+
+[X-Fleet]
