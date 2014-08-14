@@ -45,7 +45,8 @@ def defaults(client):
 
     if cred is not None:
         print 'Default Credential', cred.id
-        data['defaultCredentialIds'] = [cred.id]
+        # Don't assign it
+        # data['defaultCredentialIds'] = [cred.id]
 
     if network is not None:
         print 'Default Network', network.id

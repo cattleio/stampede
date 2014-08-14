@@ -165,9 +165,11 @@ install_units_on_machine()
 
     if [ "$found" = "false" ]; then
         info Installing/Starting unit $unit_name on $machine
+        TO_INSTALL+=($output)
+    else
+        fleetctl start $output
     fi
 
-    fleetctl start $output
 }
 
 install_units()
@@ -176,11 +178,16 @@ install_units()
     local unit
     local units=$(cd units; ls -1)
 
+    TO_INSTALL=()
     for machine in $MACHINES; do
         for unit in $units; do
             install_units_on_machine $machine $unit
         done
     done
+
+    if [ ! -z "${TO_INSTALL}" ]; then
+        fleetctl start "${TO_INSTALL[@]}"
+    fi
 }
 
 check_units()

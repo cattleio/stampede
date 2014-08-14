@@ -151,7 +151,7 @@ run_background()
         rm -f ${PIDFILE}
     fi
 
-    /opt/bin/systemd-docker --pid-file=${PIDFILE} run --rm "$@" &
+    /opt/bin/systemd-docker ${SYSTEMD_ARGS} --pid-file=${PIDFILE} run --rm "$@" &
 
     for i in {1..10}; do
         if [ ! -e $PIDFILE ]; then
