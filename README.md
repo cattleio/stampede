@@ -35,9 +35,11 @@ cd stampede
 vagrant up
 ```
 
+API/UI will be accessible at http://localhost:9080.  Running from Vagrant may take ***10 minutes to install, so please be patient.***  [Refer to the documentation](vagrant/README.md) for running a multi-node Vagrant setup.
+
 # UI
 
-API/UI will be accessible at http://localhost:9080.  Running from Vagrant may take ***10 minutes to install, so please be patient.***  [Refer to the documentation](vagrant/README.md) for running a multi-node Vagrant setup.
+[![UI](docs/ui.png)]
 
 # Functionality
 
@@ -55,11 +57,12 @@ API/UI will be accessible at http://localhost:9080.  Running from Vagrant may ta
 * Docker
   * Link containers across servers
   * Dynamically reassign links and ports
-* UI
-* REST API
-  * Use web browser to explore and use API
-* Command line client
-* Python API bindings
+* Interface
+  * UI
+  * REST API
+    * Use web browser to explore and use API
+  * Command line client
+  * Python API bindings
 
 # Contact
 
