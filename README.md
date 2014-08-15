@@ -35,6 +35,8 @@ cd stampede
 vagrant up
 ```
 
+# UI
+
 API/UI will be accessible at http://localhost:9080.  Running from Vagrant may take ***10 minutes to install, so please be patient.***  [Refer to the documentation](vagrant/README.md) for running a multi-node Vagrant setup.
 
 # Functionality
