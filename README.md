@@ -4,7 +4,7 @@ Stampede is a hybrid IaaS/Docker orcherstration platform running on CoreOS.  Giv
 
 ## Demo
 
-[![ScreenShot](docs/youtube.pn)](http://youtu.be/UsQ9cVLieaQ)
+[![ScreenShot](docs/youtube.png)](http://youtu.be/UsQ9cVLieaQ)
 
 ## Installation
 
