@@ -4,10 +4,11 @@ set -e
 NS="nsenter --mount=/host/proc/1/ns/mnt --net=/host/proc/1/ns/net -F -- "
 MANAGER=/var/lib/cattle/stampede/manager
 PORT=${PORT:-8080}
-MASTER_URL="http://172.17.42.1:4001/v2/keys/cattle/stampede/master"
-PUBLIC_MASTER_URL="http://172.17.42.1:4001/v2/keys/cattle/stampede/master_public"
+ETCD_URL="http://$(ip route get 8.8.8.8 | awk '{print $7}'):4001/v2/keys"
+MASTER_URL="${ETCD_URL}/cattle/stampede/master"
+PUBLIC_MASTER_URL="${ETCD_URL}/cattle/stampede/master_public"
 
-export REGISTRATION_URL="http://172.17.42.1:4001/v2/keys/cattle/registration_url"
+export REGISTRATION_URL="${ETCD_URL}/cattle/registration_url"
 
 cd $(dirname $0)
 
