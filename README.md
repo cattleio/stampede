@@ -2,11 +2,11 @@
 
 Stampede is a hybrid IaaS/Docker orcherstration platform running on CoreOS.  Given you have a CoreOS cluster, with in a couple minutes you should have a very capable platform to run both virtual machines and Docker (containers).
 
-## Demo
-
 [![ScreenShot](docs/youtube.png)](http://youtu.be/UsQ9cVLieaQ)
 
 ## Installation
+
+Start with a blank CoreOS cluster with Fleet and Etcd configured.
 
 ```bash
 wget http://stampede.io/latest/cattle-stampede.service
@@ -24,6 +24,8 @@ cattle-stampede-agent.76bcfb-b2c083.service     launched        b2c0835f.../10.4
 cattle-stampede-server.01c222-b2c083.service    launched        b2c0835f.../10.42.1.115 launched        b2c0835f.../10.42.1.115 active
 cattle-stampede.service                         launched        b2c0835f.../10.42.1.115 launched        b2c0835f.../10.42.1.115 active
 ```
+
+The API/UI is available at 9080 of your server.
 
 ## Vagrant
 
