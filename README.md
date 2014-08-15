@@ -39,7 +39,7 @@ API/UI will be accessible at http://localhost:9080.  Running from Vagrant may ta
 
 # UI
 
-[![UI](docs/ui.png)]
+![UI](docs/ui.png)
 
 # Functionality
 
