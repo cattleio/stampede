@@ -4,7 +4,7 @@ set -e
 NS="nsenter --mount=/host/proc/1/ns/mnt --net=/host/proc/1/ns/net -F -- "
 MANAGER=/var/lib/cattle/stampede/manager
 PORT=${PORT:-8080}
-ETCD_URL="http://$(ip route get 8.8.8.8 | awk '{print $7}'):4001/v2/keys"
+ETCD_URL="http://$(ip route get 8.8.8.8 | grep via | awk '{print $3}'):4001/v2/keys"
 MASTER_URL="${ETCD_URL}/cattle/stampede/master"
 PUBLIC_MASTER_URL="${ETCD_URL}/cattle/stampede/master_public"
 
