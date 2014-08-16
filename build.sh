@@ -41,7 +41,7 @@ for i in $DIST $BUILD; do
 done
 
 if [ -z "$IMAGES" ]; then
-    IMAGES=$(find -name stampede\* -type d -exec basename {} \; | sort -u)
+    IMAGES=$(find stampede* -name stampede\* -type d -exec basename {} \; | sort -u)
 fi
 
 for i in $IMAGES; do
