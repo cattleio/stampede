@@ -13,6 +13,7 @@ SERVICE=$ARGS
 STAMPEDE_PORT=${STAMPEDE_PORT:-8080}
 STAMPEDE_VERSION=${STAMPEDE_VERSION:-dev}
 CATTLE_VERSION=${CATTLE_VERSION:-dev}
+CATTLE_AGENT_INSTANCE_IMAGE_TAG=${CATTLE_AGENT_INSTANCE_IMAGE_TAG:-${CATTLE_VERSION}}
 
 DOCKER_ARGS=
 IMAGE=
@@ -151,7 +152,7 @@ run_background()
         rm -f ${PIDFILE}
     fi
 
-    /opt/bin/systemd-docker ${SYSTEMD_ARGS} --pid-file=${PIDFILE} run --rm "$@" &
+    /opt/bin/systemd-docker ${SYSTEMD_ARGS} --env --pid-file=${PIDFILE} run --rm "$@" &
 
     for i in {1..10}; do
         if [ ! -e $PIDFILE ]; then
@@ -202,7 +203,7 @@ setup_args()
         ;;
     cattle-libvirt)
         TAG=${CATTLE_LIBVIRT_VERSION}
-        HOST_MNTS="/lib/modules /proc /run /var/lib/docker /var/lib/cattle"
+        HOST_MNTS="/dev /lib/modules /proc /run /sys /var/lib/docker /var/lib/cattle"
         PIDFILE=/run/cattle/libvirt/libvirtd.pid
         ;;
     cattle-stampede-server)
