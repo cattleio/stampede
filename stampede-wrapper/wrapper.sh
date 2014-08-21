@@ -207,7 +207,7 @@ setup_args()
         ;;
     cattle-stampede-server)
         SYSTEMD_ARGS="--notify"
-        DOCKER_ARGS="-i -v /var/lib/cattle:/var/lib/cattle -e PORT=${STAMPEDE_PORT} -p ${STAMPEDE_PORT}:8080 -e PRIVATE_MACHINE_IP=${PRIVATE_IP} -e PUBLIC_MACHINE_IP=${PUBLIC_IP} -e CATTLE_AGENT_INSTANCE_IMAGE_TAG=${CATTLE_VERSION}"
+        DOCKER_ARGS="-i -v /var/lib/cattle:/var/lib/cattle -e PORT=${STAMPEDE_PORT} -p ${STAMPEDE_PORT}:8080 -e PRIVATE_MACHINE_IP=${PRIVATE_IP} -e PUBLIC_MACHINE_IP=${PUBLIC_IP} -e CATTLE_AGENT_INSTANCE_IMAGE_TAG=${CATTLE_AGENT_INSTANCE_IMAGE_TAG}"
         ;;
     cattle-stampede)
         HOST_MNTS="/proc"

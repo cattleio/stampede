@@ -8,6 +8,7 @@ Environment=STAMPEDE_PORT=9080
 Environment=STAMPEDE_VERSION=dev
 Environment=CATTLE_VERSION=dev
 Environment=CATTLE_LIBVIRT_VERSION=dev
+Environment=CATTLE_AGENT_INSTANCE_IMAGE_TAG=dev
 EnvironmentFile=-/etc/environment
 ExecStartPre=/usr/bin/docker run --rm -v /opt/bin:/opt/bin ibuildthecloud/systemd-docker:0.1.0
 ExecStart=/bin/bash -c "/usr/bin/docker run --rm cattle/stampede-wrapper:${STAMPEDE_VERSION} %n | bash"
