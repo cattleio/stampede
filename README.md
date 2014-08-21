@@ -1,6 +1,6 @@
 # Stampede
 
-Stampede is a hybrid IaaS/Docker orcherstration platform running on CoreOS.  Starting with an empty CoreOS cluster, with in a couple minutes you should have a very capable platform to run both virtual machines and Docker.  Stampede strives to add complex orchestration already seen in IaaS to Docker to achieve things such as secure and dynamic cross server linking.
+Stampede is a hybrid IaaS/Docker orcherstration platform running on CoreOS.  Starting with an empty CoreOS cluster, within a couple minutes, you should have a very capable platform to run both virtual machines and Docker.  Stampede strives to add complex orchestration already seen in IaaS to Docker ultimately enhancing the capabilities in networking, storage, and management.  In the end, the goal is to continue to support traditional IaaS while at the same time make Docker and containers more accessible.
 
 [![ScreenShot](docs/youtube.png)](http://youtu.be/UsQ9cVLieaQ)
 
@@ -25,7 +25,7 @@ cattle-stampede-server.01c222-b2c083.service    launched        b2c0835f.../10.4
 cattle-stampede.service                         launched        b2c0835f.../10.42.1.115 launched        b2c0835f.../10.42.1.115 active
 ```
 
-The API/UI is available at 9080 of your server.
+**The API/UI is available at 9080 of your server.**
 
 ## Vagrant
 
@@ -33,9 +33,11 @@ The API/UI is available at 9080 of your server.
 git clone https://github.com/cattleio/stampede.git
 cd stampede
 vagrant up
+
+# Open you browser to http://localhost:9080
 ```
 
-API/UI will be accessible at http://localhost:9080.  Running from Vagrant may take ***10 minutes to install, so please be patient.***  [Refer to the documentation](vagrant/README.md) for running a multi-node Vagrant setup.
+API/UI will be accessible at **http://localhost:9080**.  Running Vagrant may take ***10 minutes to install, so please be patient.***  [Refer to the documentation](vagrant/README.md) for running a multi-node Vagrant setup.  If you are running a multi-node setup, Vagrant may auto allocate different ports for 9080 for the additional nodes.
 
 # UI
 
@@ -61,6 +63,7 @@ API/UI will be accessible at http://localhost:9080.  Running from Vagrant may ta
   * VMs and containers can share the same network space
   * By default, a private IPSec VPN is created that spans servers
   * All containers and VMs live on a virtual network that can span across cloud
+  * Can also use any libvirt networking models for VMs
 * Interface
   * UI
   * REST API
@@ -80,11 +83,11 @@ Stampede and the underlying cattle.io framework was created by me as part of a 6
 
 If I have the time I'll blog in depth about the below topics, but just to give you any idea, here are a list of things I've focused on.
 
-**Hybrid IaaS/Container Orchestation System:**  Traditional IaaS systems are not a good fit for containers.  Container orchestration systems largely ignore the complex orchestation of networking and storage.  Combining the two you get a very complete solution.
-
 **Orchestration as a Service:**  By decoupling orchestration from infrastructure one can level the playing field such that you don't need to be as big as AWS, GCE, Azure to be relevant in the cloud space.  I've explored this concept [in depth on my blog](http://www.ibuildthecloud.com/blog/2014/08/12/evolution-of-docker-and-its-impact-on-aws/).
 
-**Non-reliable messaging:** Reliable (and persistent) messaging adds yet another repository of state making an already complex problem more complex.  Stampede was built with no assumption of reliability in the messaging layer.  There is no guarantee that any message sent will ever be received.
+**Hybrid IaaS/Container Orchestation System:**  Traditional IaaS systems are not a good fit for containers.  Container orchestration systems largely ignore the complex orchestation of networking and storage.  Combining the two you get a very complete solution.
+
+**Non-reliable messaging:** Reliable (and persistent) messaging adds yet another repository of state making an already complex problem even more complex.  Stampede was built with no assumption of reliability in the messaging layer.  There is no guarantee that any message sent will ever be received.
 
 **Idempotency:**  Infrastructure components fail often (in the computer science sense).  The use of idempotency allows operation to more easily recover from bad situations.  Idempotency in all operations is not only a good practice that was used in building Stampede, but it is actually built into the architecture and enforced by the framework.
 
@@ -102,11 +105,53 @@ While many systems today are “powered by” Docker, I wanted Docker to be a fi
 
 # Plans?
 
-I don't know.  [Let me know](#contact) if you find this project interesting.
+There are plenty of things I'd like to do with this platform, but it all depends on whether there is a larger interest in this work.  [Let me know](#contact) if you find this project interesting.
+
+# Networking Configuration
+
+Networking is difficult.  It's difficult because there are a million ways to do it.  Cattle.io, under the hood, has a very flexible networking model, but currently it is not fully exposed for good reason.  Right now when you deploy a container or VM you have the choice of doing a "Managed" or "Unmanaged" network.  If you choose neither, it will default the managed.
+
+## Unmanaged Networking
+
+The unmanaged network means that Cattle.io will not manage the networking at all (fancy that).  This means that for containers it will just do the default Docker behaviour, links will be limited to the current server, and port's won't be dynamic.
+
+For VMs it will create one NIC and use the default libvirt networking configuration.  This ends up being a nice hook.  What you can do is log into your individual nodes and using `virsh` you can change the network mode.  For example
+
+```bash
+virsh net-edit default
+# Edit to something like below.  The below will bridge your VM to eth0.
+# <network>
+#     <name>default</name>
+#     <uuid>836c1821-ada6-49d1-b5a5-39423fe8d385</uuid>
+#     <forward dev='eth0' mode='bridge'>
+#         <interface dev='eth0'/>
+#     </forward>
+# </network>
+virsh net-destroy default
+virsh net-start default
+```
+
+Since Cattle.io supports the OpenStack cloud config drive, the user-data and meta-data will still be available to the VM.
+
+## Managed Networking
+
+The managed networking model will put your containers and VMs on a private IPsec based network.  IPsec is used to secure the communication across hosts and additionally create your own private subnet (10.42.0.0/16).  Under the hood, there is a lot of fanciness used to make this work.  Most likely I will switch the default networking model to be VXLAN based in the future.  The current IPsec approach was done as an experiment.  It is currently working, but it is not fully tested for scale.
+
+### Setting up Public IPs
+
+Since the managed networking model will put your VM on a private network, it will not be publicly accessible.  You can also log into the server on which the VM resides and SSH to it, or jump to it from another VM on the same private network.  Chances are, if you not doing development, you want the VM to be publically accessible.  To do this you need to create an IP pool that VMs can use for public IPs.  If you would like to use 192.168.10.0/24 as your IP range, then run the following command:
+
+    cattle create-subnetIpPool --networkAddress 192.168.10.0 --name "My IP pool"
+
+The name is optional, but makes the UI nicer.  If you want a different CIDR size, range, or gateway, you can also specify those.  The full command would be something like
+
+    cattle create-subnetIpPool --networkAddress 192.168.10.0 --name "My IP Pool" --cidrSize 24 --startAddress 192.168.10.200 --endAddress 192.168.210 --gateway 192.168.10.254
+
+When you deploy your VM just choose the created IP pool for the `publicIpAddressPoolId`.  The acquired IP from the pool will be NAT'd to the private IP in a fashion to how EC2 and Elastic IPs work.
 
 # Documentation
 
-More documenation can be found at [cattle.io](http://cattle.io).  Granted it's all a bit light right now.
+More documenation can be found at [cattle.io](http://cattle.io) and [docs.cattle.io](http://docs.cattle.io).  Granted it's all a bit light right now.
 
 # Contact
 
