@@ -155,11 +155,11 @@ More documenation can be found at [cattle.io](http://cattle.io) and [docs.cattle
 
 # Contact
 
+Mailing List: https://groups.google.com/d/forum/stampedeio
+
 IRC: darren0 on freenode
 
 Twitter: @ibuildthecloud
-
-Email: darren at ibuildthecloud.com
 
 # License
 
