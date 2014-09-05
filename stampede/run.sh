@@ -208,4 +208,8 @@ while do_sleep; do
     every 5 && {
         lock check_units
     }
+    every 6000 && {
+        CURRENT_MACHINES=
+        lock check_units
+    }
 done

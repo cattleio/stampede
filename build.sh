@@ -58,7 +58,7 @@ for i in $IMAGES; do
         unit_file "Stampede : Server" > units/cattle-stampede-server.MACHINE.service
     fi
 
-    sed -i -e 's/:dev/:'$CATTLE_VERSION'/g' Dockerfile
+    sed -i -e 's/:dev/:'$CATTLE_VERSION'/g' -e 's/:stampede-dev/:'${STAMPEDE_VERSION}'/g' Dockerfile
     echo Building $IMAGE
     docker build -t $IMAGE . | sed 's!^!'$IMAGE' : !g'
     echo Done building $IMAGE
@@ -68,6 +68,7 @@ for i in $IMAGES; do
 done
 
 unit_file "Stampede : Manager" | sed '/X-ConditionMachineID/d' > $DIST/cattle-stampede.service
+unit_file "Stampede : Node Manager" | sed '/X-ConditionMachineID/d' > $DIST/cattle-stampede-node.service
 
 echo
 echo '======================================================='

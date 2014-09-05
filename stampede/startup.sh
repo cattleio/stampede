@@ -60,6 +60,7 @@ setup()
 run()
 {
     $NS mkdir -p $MANAGER
+    $NS rm -rf ${MANAGER}/units 2>/dev/null || true
     tar cf - run.sh units | $NS tar xvf - -C $MANAGER | xargs -I{} echo INFO : Installing $MANAGER/'{}'
     info Running $MANAGER/run.sh
     exec $NS $MANAGER/run.sh

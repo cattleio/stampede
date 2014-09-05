@@ -214,6 +214,10 @@ setup_args()
         HOST_MNTS="/proc"
         DOCKER_ARGS="-e PORT=${STAMPEDE_PORT}"
         ;;
+    cattle-stampede-node)
+        HOST_MNTS="/proc"
+        DOCKER_ARGS="-e PORT=${STAMPEDE_PORT}"
+        ;;
     *)
         echo "Invalid unit name $1"
         exit 1
