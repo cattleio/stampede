@@ -1,3 +1,4 @@
+## On going development of Stampede has been moved to [Rancher.io](http://rancher.io)
 # Stampede
 
 Stampede is a hybrid IaaS/Docker orcherstration platform running on CoreOS.  Starting with an empty CoreOS cluster, within a couple minutes, you should have a very capable platform to run both virtual machines and Docker.  Stampede strives to add complex orchestration already seen in IaaS to Docker ultimately enhancing the capabilities in networking, storage, and management.  In the end, the goal is to continue to support traditional IaaS while at the same time make Docker and containers more accessible.
