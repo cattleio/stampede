@@ -1,4 +1,7 @@
-## On going development of Stampede has been moved to [Rancher.io](http://rancher.io)
+## Stampede is no longer maintained please check out [Rancher](http://github.com/rancherio/rancher)
+
+Stampede was an experiment in building a hybrid IaaS/Docker orchestration system.  We've decide to not continue this approach but instead focus solely on Docker.  The Stampede code base has been used as the foundation of [Rancher](http://github.com/rancherio/rancher), where this work continues.  We've decided to focus on Docker because we've seen that the user experience and abstractions between virtual machines and Docker are quite different.  It is better to think of these two things as two different logical layers.  (Additionally we have found that it is quite easy to launch virtual machines inside a Docker container.)
+
 # Stampede
 
 Stampede is a hybrid IaaS/Docker orcherstration platform running on CoreOS.  Starting with an empty CoreOS cluster, within a couple minutes, you should have a very capable platform to run both virtual machines and Docker.  Stampede strives to add complex orchestration already seen in IaaS to Docker ultimately enhancing the capabilities in networking, storage, and management.  In the end, the goal is to continue to support traditional IaaS while at the same time make Docker and containers more accessible.
